@@ -1,4 +1,6 @@
 const Discord = require('discord.js');
+const onmessage = require('./on_message');
+
 
 const client = new Discord.Client();
 
@@ -14,11 +16,7 @@ client.on('ready', () => {
 
 client.on('message', message => {
 
-    if (message.content === 'ping') {
-
-       message.reply('pong');
-
-       }
+    onmessage.on_message(message);
 
 });
 
