@@ -42,11 +42,21 @@ module.exports = {
     
     listUsers: function(message) {
         var members = message.guild.members.array();
-        var text = '';
+        var text = '```';
         text += members.length + ' members total.' + '\n';
+        text += this.pad('id',20) + '\t' + this.pad('displayName') + '\t' + this.pad('joinDate') + '\t' + 'lastMessageDate' + '\n';
+        var i = 0;
         for(let member of members) {
-            text += member.displayName + '\n';
+            text += this.pad(member.id,20) + '\t' + this.pad(member.displayName) + '\t' + this.pad(member.joinedAt) + '\t' + (member.lastMessage ? member.lastMessage.createdAt : '') + '\n';
+            i++;
+            if(i >= 15) {
+                text += '```';
+                message.channel.send(text);
+                text = '```';
+                i = 0;
+            }
         }
+        text += '```';
         message.channel.send(text);
     },
 
@@ -67,18 +77,26 @@ module.exports = {
         }
         // output roles count
         var text = '```\n';
+        var i = 0;
         for(let name in roles_count) {
             var rolename = name;
             if(rolename == "@everyone")
                 rolename = "everyone";
             text += this.pad(rolename) + roles_count[name] + '\n';
+            i++;
+            if(i >= 50) {
+                text += '```';
+                message.channel.send(text);
+                text = '```\n';
+                i = 0;
+            }
         }
         text += '```';
         message.channel.send(text);
     },
 
-    pad: function(str) {
-        var pad = Array(30).join(' ');
+    pad: function(str, length = 30) {
+        var pad = Array(length).join(' ');
         var padLeft = false;
         if (typeof str === 'undefined') 
           return pad;
