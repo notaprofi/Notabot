@@ -68,7 +68,10 @@ module.exports = {
         // output roles count
         var text = '.\n';
         for(let name in roles_count) {
-            text += this.pad(name) + '|\t\t' + roles_count[name] + '\n';
+            var rolename = name;
+            if(rolename == "@everyone")
+                rolename = "everyone";
+            text += this.pad(rolename) + '|\t\t' + roles_count[name] + '\n';
         }
         message.channel.send(text);
     },
