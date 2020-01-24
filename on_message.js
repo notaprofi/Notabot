@@ -67,13 +67,20 @@ module.exports = {
         for(let role of roles) {
             roles_count[role.name] = 0;
         }
+        roles_count["{NO ROLE}"] = 0;
         // count roles
         var members = message.guild.members.array();
         for(let member of members) {
+
             var member_roles = member.roles.array();
             for(let mr of member_roles) {
                 roles_count[mr.name]++;
             }
+
+            if ( member_roles.length <= 1 ) { // only everyone
+                roles_count["{NO ROLE}"]++;
+            }
+            
         }
         // output roles count
         var text = '```\n';
