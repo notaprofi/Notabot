@@ -113,8 +113,8 @@ module.exports = {
         var iLines = 0;
         for(let iM = 0; iM < members.length; iM++) {
             let member = members[iM];
-            if (member.hasPermission(['KICK_MEMBERS']) || member.roles.array().length == 1) {
-                member.nOffDays = 0; // don't check moderators and people with only @everyone role
+            if (member.hasPermission(['KICK_MEMBERS']) || member.roles.array().length == 1 || member.presence.status != 'offline') {
+                member.nOffDays = 0; // don't check: a) moderators, b) people with no roles, c) people who are online atm
                 continue;
             }
             setTimeout( function() {
