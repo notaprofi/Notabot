@@ -19,6 +19,12 @@ module.exports = {
                 case 'listUsers':
                     this.listUsers(message);
                     break;
+                case 'listUsersShort':
+                    this.listUsers2(message);
+                    break;
+                case 'listUserIds':
+                    this.listUsers3(message);
+                    break;
                 case 'countRoles':
                     this.countRoles(message);
                     break;
@@ -34,6 +40,8 @@ module.exports = {
         text += '!help - show this text\n';
         text += '!notatest - check if the bot is online\n';
         text += '!listUsers - show users table\n';
+        text += '!listUsersShort - show a smaller users table\n';
+        text += '!listUserIds - show only users Ids\n';
         text += '!countRoles - show roles table\n';
         text += '!inactivity NDAYS - show people who are offline for NDAYS+ days\n';
         message.channel.send(text);
@@ -53,6 +61,46 @@ module.exports = {
             text += this.pad(member.id,20) + '\t' + this.pad(member.displayName) + '\t' + this.pad(member.joinedAt) + '\t' + (member.lastMessage ? member.lastMessage.createdAt : '') + '\n';
             i++;
             if(i >= 15) {
+                text += '```';
+                message.channel.send(text);
+                text = '```';
+                i = 0;
+            }
+        }
+        text += '```';
+        message.channel.send(text);
+    },
+
+    listUsers2: function(message) {
+        var members = message.guild.members.array();
+        var text = '```';
+        text += members.length + ' members total.' + '\n';
+        text += this.pad('id',20) + '\t' + this.pad('displayName') + '\n';
+        var i = 0;
+        for(let member of members) {
+            text += this.pad(member.id,20) + '\t' + this.pad(member.displayName) + '\n';
+            i++;
+            if(i >= 30) {
+                text += '```';
+                message.channel.send(text);
+                text = '```';
+                i = 0;
+            }
+        }
+        text += '```';
+        message.channel.send(text);
+    },
+    
+    listUsers3: function(message) {
+        var members = message.guild.members.array();
+        var text = '```';
+        text += members.length + ' members total.' + '\n';
+        text += this.pad('id',20) + '\n';
+        var i = 0;
+        for(let member of members) {
+            text += this.pad(member.id,20) + '\n';
+            i++;
+            if(i >= 90) {
                 text += '```';
                 message.channel.send(text);
                 text = '```';
@@ -106,6 +154,11 @@ module.exports = {
     },
 
     inactivity: function(message, MaxOffDays = 180) {
+        MaxOffDays = Number(MaxOffDays);
+        if (MaxOffDays > 30) {
+            MaxOffDays = 30;
+            message.channel.send('Sorry, the max parameter is 30.');
+        }
         const timePerUser = 5000;
         var members = message.guild.members.array();
         message.channel.send('I am looking for members with a role who are ' + MaxOffDays + ' or more days offline.\nI will be done in less than ' + members.length*timePerUser/60000 + ' minutes.');
@@ -119,7 +172,7 @@ module.exports = {
             }
             setTimeout( function() {
                 console.log(member.displayName + " GO!\n");
-                module.exports.daysOffline(message, member, Number(MaxOffDays));
+                module.exports.daysOffline(message, member, MaxOffDays);
             }, iM*timePerUser);
         }
         setTimeout( function() {
@@ -154,6 +207,7 @@ module.exports = {
         return new Promise(function(resolve, reject) {
             var nGuests = 0;
             var nGuestsPlus = 0;
+            
             message.guild.pruneMembers(N, true)
             .then(function(result) {
                 nGuests = result;
@@ -169,7 +223,7 @@ module.exports = {
 
                 member.removeRoles(roles_backup)
                 .then(() => {
-
+                    
                     nGuestsPlus = message.guild.pruneMembers(N, true).then(function(result) {
                         nGuestsPlus = result;
                     }).then(() => {
