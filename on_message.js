@@ -17,13 +17,22 @@ module.exports = {
                     this.test(message);
                     break;
                 case 'listUsers':
-                    this.listUsers(message);
+                    this.listUsers(message, false);
+                    break;
+                case 'listMembers':
+                    this.listUsers(message, true);
                     break;
                 case 'listUsersShort':
-                    this.listUsers2(message);
+                    this.listUsers2(message, false);
                     break;
-                case 'listUserIds':
-                    this.listUsers3(message);
+                case 'listMembersShort':
+                    this.listUsers2(message, true);
+                    break;
+                case 'listUsersIds':
+                    this.listUsers3(message, false);
+                    break;
+                case 'listMembersIds':
+                    this.listUsers3(message, true);
                     break;
                 case 'countRoles':
                     this.countRoles(message);
@@ -41,7 +50,8 @@ module.exports = {
         text += '!notatest - check if the bot is online\n';
         text += '!listUsers - show users table\n';
         text += '!listUsersShort - show a smaller users table\n';
-        text += '!listUserIds - show only users Ids\n';
+        text += '!listUsersIds - show only users Ids\n';
+        text += '!listMembers, !listMembersShort, !listMembersIds - the same as above, but list only people with at least 1 role\n';
         text += '!countRoles - show roles table\n';
         text += '!inactivity NDAYS - show people who are offline for NDAYS+ days\n';
         message.channel.send(text);
@@ -51,13 +61,17 @@ module.exports = {
         message.channel.send('Notabot is online');
     },
     
-    listUsers: function(message) {
+    listUsers: function(message, showOnlyMembersWithARole) {
         var members = message.guild.members.array();
         var text = '```';
-        text += members.length + ' members total.' + '\n';
+        text += members.length + ' users total.' + '\n';
         text += this.pad('id',20) + '\t' + this.pad('displayName') + '\t' + this.pad('joinDate') + '\t' + 'lastMessageDate' + '\n';
         var i = 0;
         for(let member of members) {
+            if ( member.roles.array().length <= 1 && showOnlyMembersWithARole) { // only everyone
+                continue;
+            }
+
             text += this.pad(member.id,20) + '\t' + this.pad(member.displayName) + '\t' + this.pad(member.joinedAt) + '\t' + (member.lastMessage ? member.lastMessage.createdAt : '') + '\n';
             i++;
             if(i >= 15) {
@@ -71,13 +85,17 @@ module.exports = {
         message.channel.send(text);
     },
 
-    listUsers2: function(message) {
+    listUsers2: function(message, showOnlyMembersWithARole) {
         var members = message.guild.members.array();
         var text = '```';
-        text += members.length + ' members total.' + '\n';
+        text += members.length + ' users total.' + '\n';
         text += this.pad('id',20) + '\t' + this.pad('displayName') + '\n';
         var i = 0;
         for(let member of members) {
+            if ( member.roles.array().length <= 1 && showOnlyMembersWithARole) { // only everyone
+                continue;
+            }
+
             text += this.pad(member.id,20) + '\t' + this.pad(member.displayName) + '\n';
             i++;
             if(i >= 30) {
@@ -91,13 +109,17 @@ module.exports = {
         message.channel.send(text);
     },
     
-    listUsers3: function(message) {
+    listUsers3: function(message, showOnlyMembersWithARole) {
         var members = message.guild.members.array();
         var text = '```';
-        text += members.length + ' members total.' + '\n';
+        text += members.length + ' users total.' + '\n';
         text += this.pad('id',20) + '\n';
         var i = 0;
         for(let member of members) {
+            if ( member.roles.array().length <= 1 && showOnlyMembersWithARole) { // only everyone
+                continue;
+            }
+
             text += this.pad(member.id,20) + '\n';
             i++;
             if(i >= 90) {
